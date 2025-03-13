@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+: ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
+
 echo "Installing K3s..."
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable=traefik --write-kubeconfig-mode=644" sh -
 
@@ -17,7 +19,7 @@ kubectl create namespace kwasm || true
 kubectl apply -f ../deployments/workloads/runtime.yaml
 
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
-if ! docker image inspect ghcr.io/spinkube/containerd-shim-spin/node-installer:dev >/dev/null 2>&1; then
+if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
   echo "Building node installer image..."
   PLATFORM=$(uname -m)
   if [ "$PLATFORM" = "x86_64" ]; then
@@ -31,11 +33,11 @@ if ! docker image inspect ghcr.io/spinkube/containerd-shim-spin/node-installer:d
     exit 1
   fi
   
-  PLATFORM=$PLATFORM ARCH=$ARCH IMAGE_NAME=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev make build-dev-installer-image
+  PLATFORM=$PLATFORM ARCH=$ARCH IMAGE_NAME=$IMAGE_NAME make build-dev-installer-image
 fi
 
 echo "Loading node installer image into K3s..."
-docker save ghcr.io/spinkube/containerd-shim-spin/node-installer:dev > node-installer.tar
+docker save $IMAGE_NAME > node-installer.tar
 sudo k3s ctr images import node-installer.tar
 rm node-installer.tar
 
@@ -59,6 +61,7 @@ if ! kubectl get pods -n kwasm | grep -q "k3s-provision-kwasm.*Completed"; then
 fi
 
 echo "=== Step 4: Apply the workload ==="
+sudo k3s ctr images pull ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.18.0
 kubectl apply -f ../deployments/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."

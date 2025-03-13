@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+: ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
+
 echo "=== Step 1: Setup MicroK8s ==="
 if ! command -v microk8s >/dev/null 2>&1; then
   echo "MicroK8s is not installed. Please install it first."
@@ -9,23 +11,23 @@ fi
 
 if ! microk8s status | grep -q "microk8s is running"; then
   echo "Starting MicroK8s..."
-  microk8s start
+  sudo microk8s start
   sleep 10
 else
-  microk8s reset
+  sudo microk8s reset
   sleep 10
 fi
 
-microk8s enable dns
+sudo microk8s enable dns
 
-alias kubectl='microk8s kubectl'
+alias kubectl='sudo microk8s kubectl'
 
 echo "=== Step 2: Create namespace and deploy RuntimeClass ==="
 kubectl create namespace kwasm || true
 kubectl apply -f ../deployments/workloads/runtime.yaml
 
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
-if ! docker image inspect ghcr.io/spinkube/containerd-shim-spin/node-installer:dev >/dev/null 2>&1; then
+if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
   echo "Building node installer image..."
   PLATFORM=$(uname -m)
   if [ "$PLATFORM" = "x86_64" ]; then
@@ -39,15 +41,15 @@ if ! docker image inspect ghcr.io/spinkube/containerd-shim-spin/node-installer:d
     exit 1
   fi
   
-  PLATFORM=$PLATFORM ARCH=$ARCH IMAGE_NAME=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev make build-dev-installer-image
+  PLATFORM=$PLATFORM ARCH=$ARCH IMAGE_NAME=$IMAGE_NAME make build-dev-installer-image
 fi
 
 echo "Loading node installer image into MicroK8s..."
-docker save ghcr.io/spinkube/containerd-shim-spin/node-installer:dev > node-installer.tar
-microk8s ctr image import node-installer.tar
+docker save $IMAGE_NAME > node-installer.tar
+sudo microk8s ctr image import node-installer.tar
 rm node-installer.tar
 
-NODE_NAME=$(microk8s kubectl get nodes -o jsonpath='{.items[0].metadata.name}')
+NODE_NAME=$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')
 cp kwasm-job.yml microk8s-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm/microk8s-provision-kwasm/g" microk8s-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm-dev/microk8s-provision-kwasm-dev/g" microk8s-kwasm-job.yml
@@ -79,7 +81,7 @@ echo "=== Step 5: Test the workload ==="
 echo "Waiting for service to be ready..."
 sleep 10
 
-microk8s enable ingress
+sudo microk8s enable ingress
 sleep 5
 
 echo "Testing workload with curl..."

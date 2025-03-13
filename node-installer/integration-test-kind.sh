@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+: ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
+
 echo "=== Step 1: Create a kind cluster ==="
 if kind get clusters | grep -q "spin-test"; then
   echo "Deleting existing cluster..."
@@ -16,7 +18,7 @@ kubectl --context=kind-spin-test create namespace kwasm || true
 kubectl --context=kind-spin-test apply -f ../deployments/workloads/runtime.yaml
 
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
-if ! docker image inspect ghcr.io/spinkube/containerd-shim-spin/node-installer:v0.18.0 >/dev/null 2>&1; then
+if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
   echo "Building node installer image..."
   PLATFORM=$(uname -m)
   if [ "$PLATFORM" = "x86_64" ]; then
@@ -30,11 +32,11 @@ if ! docker image inspect ghcr.io/spinkube/containerd-shim-spin/node-installer:v
     exit 1
   fi
   
-  PLATFORM=$PLATFORM ARCH=$ARCH IMAGE_NAME=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev make build-dev-installer-image
+  PLATFORM=$PLATFORM ARCH=$ARCH IMAGE_NAME=$IMAGE_NAME make build-dev-installer-image
 fi
 
 echo "Loading node installer image into kind..."
-kind load docker-image ghcr.io/spinkube/containerd-shim-spin/node-installer:dev --name spin-test
+kind load docker-image $IMAGE_NAME --name spin-test
 
 echo "Applying KWasm node installer job..."
 kubectl --context=kind-spin-test apply -f ./kwasm-job.yml
