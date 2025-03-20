@@ -39,11 +39,22 @@ mkdir -p $NODE_ROOT$KWASM_DIR/bin/
 cp /assets/containerd-shim-spin-v2 $NODE_ROOT$KWASM_DIR/bin/
 
 if ! grep -q spin $NODE_ROOT$CONTAINERD_CONF; then
-    echo '
+    if $IS_K3S; then
+        echo '
+[plugins."io.containerd.cri.v1.runtime".containerd.runtimes."spin"]
+    runtime_type = "'$KWASM_DIR'/bin/containerd-shim-spin-v2"
+' >> $NODE_ROOT$CONTAINERD_CONF
+    else
+        echo '
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.spin]
     runtime_type = "'$KWASM_DIR'/bin/containerd-shim-spin-v2"
 ' >> $NODE_ROOT$CONTAINERD_CONF
+    fi
     rm -Rf $NODE_ROOT$KWASM_DIR/active
+fi
+
+if $IS_K3S; then
+    sed -i "s|runtime_type = \"io.containerd.spin.*\"|runtime_type = \"$KWASM_DIR/bin/containerd-shim-spin-v2\"|g" $NODE_ROOT$CONTAINERD_CONF
 fi
 
 if [ ! -f $NODE_ROOT$KWASM_DIR/active ]; then
