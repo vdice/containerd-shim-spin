@@ -10,7 +10,17 @@ if kind get clusters | grep -q "spin-test"; then
 fi
 
 echo "Creating kind cluster..."
-kind create cluster --config .kind/kind-config.yaml
+kind create cluster --config - << EOF
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: spin-test
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 8080
+    protocol: TCP
+EOF
 kubectl --context=kind-spin-test wait --for=condition=Ready nodes --all --timeout=90s
 
 echo "=== Step 2: Create namespace and deploy RuntimeClass ==="
