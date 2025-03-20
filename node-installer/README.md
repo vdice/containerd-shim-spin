@@ -10,7 +10,7 @@ project to handle this concern in the future.
 
 ## Integration Tests
 
-The project includes integration test scripts for different Kubernetes distributions:
+The project includes integration test scripts for different Kubernetes distributions in the `tests/` directory:
 
 1. Kind: `make test-kind`
 2. MiniKube: `make test-minikube`

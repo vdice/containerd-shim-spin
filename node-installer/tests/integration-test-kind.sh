@@ -25,7 +25,7 @@ kubectl --context=kind-spin-test wait --for=condition=Ready nodes --all --timeou
 
 echo "=== Step 2: Create namespace and deploy RuntimeClass ==="
 kubectl --context=kind-spin-test create namespace kwasm || true
-kubectl --context=kind-spin-test apply -f ../deployments/workloads/runtime.yaml
+kubectl --context=kind-spin-test apply -f ./tests/workloads/runtime.yaml
 
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
 if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
@@ -49,7 +49,7 @@ echo "Loading node installer image into kind..."
 kind load docker-image $IMAGE_NAME --name spin-test
 
 echo "Applying KWasm node installer job..."
-kubectl --context=kind-spin-test apply -f ./kwasm-job.yml
+kubectl --context=kind-spin-test apply -f ./tests/workloads/kwasm-job.yml
 
 echo "Waiting for node installer job to complete..."
 kubectl --context=kind-spin-test wait -n kwasm --for=condition=Ready pod --selector=job-name=spin-test-control-plane-provision-kwasm --timeout=90s || true
@@ -62,7 +62,7 @@ if ! kubectl --context=kind-spin-test get pods -n kwasm | grep -q "spin-test-con
 fi
 
 echo "=== Step 4: Apply the workload ==="
-kubectl --context=kind-spin-test apply -f ../deployments/workloads/workload.yaml
+kubectl --context=kind-spin-test apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
 kubectl --context=kind-spin-test wait --for=condition=Available deployment/wasm-spin --timeout=120s

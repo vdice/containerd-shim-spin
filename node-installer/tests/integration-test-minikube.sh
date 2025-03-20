@@ -8,7 +8,7 @@ minikube start -p minikube --driver=docker --container-runtime=containerd
 
 echo "=== Step 2: Create namespace and deploy RuntimeClass ==="
 kubectl create namespace kwasm || true
-kubectl apply -f ../deployments/workloads/runtime.yaml
+kubectl apply -f ./tests/workloads/runtime.yaml
 
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
 if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
@@ -32,7 +32,7 @@ echo "Loading node installer image into MiniKube..."
 minikube image load $IMAGE_NAME -p minikube
 
 NODE_NAME=$(kubectl get nodes --context=minikube -o jsonpath='{.items[0].metadata.name}')
-cp kwasm-job.yml minikube-kwasm-job.yml
+cp ./tests/workloads/kwasm-job.yml minikube-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm/minikube-provision-kwasm/g" minikube-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm-dev/minikube-provision-kwasm-dev/g" minikube-kwasm-job.yml
 sed -i "s/spin-test-control-plane/${NODE_NAME}/g" minikube-kwasm-job.yml
@@ -51,7 +51,7 @@ if ! kubectl get pods -n kwasm | grep -q "minikube-provision-kwasm.*Completed"; 
 fi
 
 echo "=== Step 4: Apply the workload ==="
-kubectl apply -f ../deployments/workloads/workload.yaml
+kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
 kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s

@@ -24,7 +24,7 @@ alias kubectl='sudo microk8s kubectl'
 
 echo "=== Step 2: Create namespace and deploy RuntimeClass ==="
 kubectl create namespace kwasm || true
-kubectl apply -f ../deployments/workloads/runtime.yaml
+kubectl apply -f ./tests/workloads/runtime.yaml
 
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
 if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
@@ -50,7 +50,7 @@ sudo microk8s ctr image import node-installer.tar
 rm node-installer.tar
 
 NODE_NAME=$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')
-cp kwasm-job.yml microk8s-kwasm-job.yml
+cp ./tests/workloads/kwasm-job.yml microk8s-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm/microk8s-provision-kwasm/g" microk8s-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm-dev/microk8s-provision-kwasm-dev/g" microk8s-kwasm-job.yml
 sed -i "s/spin-test-control-plane/${NODE_NAME}/g" microk8s-kwasm-job.yml
@@ -69,7 +69,7 @@ if ! kubectl get pods -n kwasm | grep -q "microk8s-provision-kwasm.*Completed"; 
 fi
 
 echo "=== Step 4: Apply the workload ==="
-kubectl apply -f ../deployments/workloads/workload.yaml
+kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
 kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s

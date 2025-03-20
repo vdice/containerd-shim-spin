@@ -20,15 +20,15 @@ build-dev-installer-image: $(BINARY)
 	docker buildx build -t $(IMAGE_NAME) --load --platform $(PLATFORM) .
 
 test-kind:
-	./integration-test-kind.sh
+	./tests/integration-test-kind.sh
 
 test-minikube:
-	./integration-test-minikube.sh
+	./tests/integration-test-minikube.sh
 
 test-microk8s:
-	./integration-test-microk8s.sh
+	./tests/integration-test-microk8s.sh
 
 test-k3s:
-	./integration-test-k3s.sh
+	./tests/integration-test-k3s.sh
 
 test-all: test-kind test-minikube test-microk8s test-k3s

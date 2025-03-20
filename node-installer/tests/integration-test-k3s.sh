@@ -16,7 +16,7 @@ done
 
 echo "=== Step 2: Create namespace and deploy RuntimeClass ==="
 kubectl create namespace kwasm || true
-kubectl apply -f ../deployments/workloads/runtime.yaml
+kubectl apply -f ./tests/workloads/runtime.yaml
 
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
 if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
@@ -42,7 +42,7 @@ sudo k3s ctr images import node-installer.tar
 rm node-installer.tar
 
 NODE_NAME=$(kubectl get nodes -o jsonpath='{.items[0].metadata.name}')
-cp kwasm-job.yml k3s-kwasm-job.yml
+cp ./tests/workloads/kwasm-job.yml k3s-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm/k3s-provision-kwasm/g" k3s-kwasm-job.yml
 sed -i "s/spin-test-control-plane-provision-kwasm-dev/k3s-provision-kwasm-dev/g" k3s-kwasm-job.yml
 sed -i "s/spin-test-control-plane/${NODE_NAME}/g" k3s-kwasm-job.yml
@@ -62,7 +62,7 @@ fi
 
 echo "=== Step 4: Apply the workload ==="
 sudo k3s ctr images pull ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.18.0
-kubectl apply -f ../deployments/workloads/workload.yaml
+kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
 kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s
