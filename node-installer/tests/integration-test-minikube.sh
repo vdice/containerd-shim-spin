@@ -13,19 +13,7 @@ kubectl apply -f ./tests/workloads/runtime.yaml
 echo "=== Step 3: Build and deploy the KWasm node installer ==="
 if ! docker image inspect $IMAGE_NAME >/dev/null 2>&1; then
   echo "Building node installer image..."
-  PLATFORM=$(uname -m)
-  if [ "$PLATFORM" = "x86_64" ]; then
-    PLATFORM="linux/amd64"
-    ARCH="x86_64"
-  elif [ "$PLATFORM" = "aarch64" ] || [ "$PLATFORM" = "arm64" ]; then
-    PLATFORM="linux/arm64"
-    ARCH="aarch64"
-  else
-    echo "Unsupported platform: $PLATFORM"
-    exit 1
-  fi
-  
-  PLATFORM=$PLATFORM ARCH=$ARCH IMAGE_NAME=$IMAGE_NAME make build-dev-installer-image
+  IMAGE_NAME=$IMAGE_NAME make build-dev-installer-image
 fi
 
 echo "Loading node installer image into MiniKube..."
