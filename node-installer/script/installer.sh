@@ -90,7 +90,7 @@ if ! grep -q 'runtimes.spin.options' $NODE_ROOT$CONTAINERD_CONF && [ "$SYSTEMD_C
     echo "Setting SystemdCgroup to $SYSTEMD_CGROUP in Spin containerd configuration"
     if $IS_K3S; then
         echo '
-[plugins."io.containerd.cri.v1.runtime".containerd.runtimes."spin".options]
+[plugins."io.containerd.cri.v1.runtime".containerd.runtimes.spin.options]
     SystemdCgroup = '$SYSTEMD_CGROUP'
 ' >> $NODE_ROOT$CONTAINERD_CONF
     else
