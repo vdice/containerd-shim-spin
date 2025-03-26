@@ -40,9 +40,13 @@ sed -i "s/spin-test-control-plane/${NODE_NAME}/g" minikube-kwasm-job.yml
 echo "Applying KWasm node installer job..."
 kubectl apply -f ./minikube-kwasm-job.yml
 
-echo "Waiting for node installer job to complete..."
 kubectl wait -n kwasm --for=condition=Ready pod --selector=job-name=minikube-provision-kwasm --timeout=90s || true
-kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=minikube-provision-kwasm --timeout=60s
+echo "Waiting for node installer job to complete..."
+if ! kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=minikube-provision-kwasm --timeout=60s; then
+  echo "Node installer job failed!"
+  kubectl describe pod -n kwasm
+  exit 1
+fi
 
 # Verify the SystemdCgroup is set to true
 if docker exec $NODE_NAME cat /etc/containerd/config.toml | grep -A5 "spin" | grep -q "SystemdCgroup = true"; then
@@ -62,7 +66,11 @@ echo "=== Step 4: Apply the workload ==="
 kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
-kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s
+if ! kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s; then
+  echo "Deployment failed to become ready!"
+  kubectl describe po wasm-spin
+  exit 1
+fi
 
 echo "Checking pod status..."
 kubectl get pods

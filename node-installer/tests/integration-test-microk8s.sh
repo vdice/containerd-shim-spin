@@ -80,7 +80,7 @@ echo "=== Step 4: Apply the workload ==="
 kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
-if kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s; then
+if ! kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s; then
   echo "Deployment failed to become ready!"
   kubectl describe deployment wasm-spin
   exit 1
