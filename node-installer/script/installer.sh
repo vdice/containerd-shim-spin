@@ -11,27 +11,6 @@ IS_MICROK8S=false
 IS_K3S=false
 IS_RKE2_AGENT=false
 IS_K0S_WORKER=false
-SYSTEMD_CGROUP=true
-
-# Install D-Bus if it's not available but systemd cgroups are requested
-if [ "$SYSTEMD_CGROUP" = "true" ]; then
-    if ! nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which dbus-daemon >/dev/null 2>&1; then
-        if nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which apt-get >/dev/null 2>&1; then
-            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- apt-get update -y
-            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- apt-get install -y dbus
-        elif nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which yum >/dev/null 2>&1; then
-            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- yum install -y dbus
-        elif nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which dnf >/dev/null 2>&1; then
-            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- dnf install -y dbus
-        elif nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which apk >/dev/null 2>&1; then
-            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- apk add dbus
-        else
-            echo "WARNING: Could not install D-Bus. No supported package manager found."
-            SYSTEMD_CGROUP=false
-            echo "SYSTEMD_CGROUP is now set to $SYSTEMD_CGROUP"
-        fi
-    fi
-fi
 
 if pgrep -f snap/microk8s > /dev/null; then
     CONTAINERD_CONF=/var/snap/microk8s/current/args/containerd-template.toml
@@ -54,6 +33,34 @@ elif pgrep -f /var/lib/k0s/bin/kubelet > /dev/null; then
     IS_K0S_WORKER=true
     CONTAINERD_CONF=/etc/k0s/containerd.d/spin.toml
     touch $NODE_ROOT$CONTAINERD_CONF
+fi
+
+# If SYSTEMD_CGROUP is not set, default to true except for distros that do not default to systemd
+# TODO: detect k3d which defaults to cgroupfs
+if [ -z "${SYSTEMD_CGROUP+x}" ] && [ "$IS_MICROK8S" = "true" ]; then
+    SYSTEMD_CGROUP=false
+else
+    : "${SYSTEMD_CGROUP:=true}"
+fi
+
+# Install D-Bus if it's not available but systemd cgroups are requested
+if [ "$SYSTEMD_CGROUP" = "true" ]; then
+    if ! nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which dbus-daemon >/dev/null 2>&1; then
+        if nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which apt-get >/dev/null 2>&1; then
+            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- apt-get update -y
+            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- apt-get install -y dbus
+        elif nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which yum >/dev/null 2>&1; then
+            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- yum install -y dbus
+        elif nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which dnf >/dev/null 2>&1; then
+            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- dnf install -y dbus
+        elif nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- which apk >/dev/null 2>&1; then
+            nsenter -m/$NODE_ROOT/proc/1/ns/mnt -- apk add dbus
+        else
+            echo "WARNING: Could not install D-Bus. No supported package manager found."
+            SYSTEMD_CGROUP=false
+            echo "SYSTEMD_CGROUP is now set to $SYSTEMD_CGROUP"
+        fi
+    fi
 fi
 
 mkdir -p $NODE_ROOT$KWASM_DIR/bin/
@@ -83,7 +90,7 @@ if ! grep -q 'runtimes.spin.options' $NODE_ROOT$CONTAINERD_CONF; then
     echo "Setting SystemdCgroup to $SYSTEMD_CGROUP in Spin containerd configuration"
     if $IS_K3S; then
         echo '
-[plugins."io.containerd.cri.v1.runtime".containerd.runtimes.spin.options]
+[plugins."io.containerd.cri.v1.runtime".containerd.runtimes."spin".options]
     SystemdCgroup = '$SYSTEMD_CGROUP'
 ' >> $NODE_ROOT$CONTAINERD_CONF
     else
