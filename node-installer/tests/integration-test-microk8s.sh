@@ -60,11 +60,10 @@ echo "Applying KWasm node installer job..."
 kubectl apply -f ./microk8s-kwasm-job.yml
 
 echo "Waiting for node installer job to complete..."
-kubectl wait -n kwasm --for=condition=Ready pod --selector=job-name=microk8s-provision-kwasm --timeout=90s || true
 kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=microk8s-provision-kwasm --timeout=60s
 
 # Verify the SystemdCgroup is set to true
-cat /var/snap/microk8s/current/args/containerd.toml | grep -A5 "spin" | grep "SystemdCgroup = true"
+sudo cat /var/snap/microk8s/current/args/containerd.toml | grep -A5 "spin" | grep "SystemdCgroup = true"
 
 if ! kubectl get pods -n kwasm | grep -q "microk8s-provision-kwasm.*Completed"; then
   echo "Node installer job failed!"
