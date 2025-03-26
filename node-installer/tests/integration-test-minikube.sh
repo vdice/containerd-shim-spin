@@ -45,7 +45,12 @@ kubectl wait -n kwasm --for=condition=Ready pod --selector=job-name=minikube-pro
 kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=minikube-provision-kwasm --timeout=60s
 
 # Verify the SystemdCgroup is set to true
-docker exec $NODE_NAME cat /etc/containerd/config.toml | grep -A5 "spin" | grep "SystemdCgroup = true"
+if docker exec $NODE_NAME cat /etc/containerd/config.toml | grep -A5 "spin" | grep -q "SystemdCgroup = true"; then
+  echo "SystemdCgroup is set to true"
+else
+  echo "SystemdCgroup is not set to true"
+  exit 1
+fi
 
 if ! kubectl get pods -n kwasm | grep -q "minikube-provision-kwasm.*Completed"; then
   echo "Node installer job failed!"
