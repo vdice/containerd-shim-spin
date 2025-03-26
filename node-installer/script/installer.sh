@@ -83,10 +83,10 @@ if ! grep -q spin $NODE_ROOT$CONTAINERD_CONF; then
     rm -Rf $NODE_ROOT$KWASM_DIR/active
 fi
 
-# Check if Spin runtime options have not been configured
+# Configure Spin runtime options if using systemd cgroups and no options are configured
 # TODO: this should allow for some options to already be configured and just additively 
-# configuring SystemdCgroup
-if ! grep -q 'runtimes.spin.options' $NODE_ROOT$CONTAINERD_CONF; then
+# configure SystemdCgroup
+if ! grep -q 'runtimes.spin.options' $NODE_ROOT$CONTAINERD_CONF && [ "$SYSTEMD_CGROUP" = "true" ]; then
     echo "Setting SystemdCgroup to $SYSTEMD_CGROUP in Spin containerd configuration"
     if $IS_K3S; then
         echo '
