@@ -4,7 +4,8 @@ set -euo pipefail
 : ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
 
 echo "=== Step 1: Create a MiniKube cluster ==="
-minikube start -p minikube --driver=docker --container-runtime=containerd
+docker build -t minikube-custom:v0.0.46-fixed -f ./tests/Dockerfile.minikube-custom .
+minikube start -p minikube --driver=docker --container-runtime=containerd --base-image="minikube-custom:v0.0.46-fixed"
 
 echo "=== Step 2: Create namespace and deploy RuntimeClass ==="
 kubectl create namespace kwasm || true
@@ -43,6 +44,14 @@ kubectl apply -f ./minikube-kwasm-job.yml
 echo "Waiting for node installer job to complete..."
 kubectl wait -n kwasm --for=condition=Ready pod --selector=job-name=minikube-provision-kwasm --timeout=90s || true
 kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=minikube-provision-kwasm --timeout=60s
+
+# Verify the SystemdCgroup is set to true
+if docker exec $NODE_NAME cat /etc/containerd/config.toml | grep -A5 "spin" | grep -q "SystemdCgroup = true"; then
+  echo "SystemdCgroup is set to true"
+else
+  echo "SystemdCgroup is not set to true"
+  exit 1
+fi
 
 if ! kubectl get pods -n kwasm | grep -q "minikube-provision-kwasm.*Completed"; then
   echo "Node installer job failed!"

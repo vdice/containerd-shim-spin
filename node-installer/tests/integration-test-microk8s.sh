@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+shopt -s expand_aliases
 
 : ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
 
@@ -12,11 +13,11 @@ fi
 if ! microk8s status | grep -q "microk8s is running"; then
   echo "Starting MicroK8s..."
   sudo microk8s start
-  sleep 10
 else
   sudo microk8s reset
-  sleep 10
 fi
+
+sudo microk8s status --wait-ready
 
 sudo microk8s enable dns
 
@@ -59,8 +60,15 @@ echo "Applying KWasm node installer job..."
 kubectl apply -f ./microk8s-kwasm-job.yml
 
 echo "Waiting for node installer job to complete..."
-kubectl wait -n kwasm --for=condition=Ready pod --selector=job-name=microk8s-provision-kwasm --timeout=90s || true
 kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=microk8s-provision-kwasm --timeout=60s
+
+# Ensure the SystemdCgroup is not set to true
+if sudo cat /var/snap/microk8s/current/args/containerd.toml | grep -A5 "spin" | grep -q "SystemdCgroup = true"; then
+  echo "Failed: SystemdCgroup is set to true"
+  exit 1
+else
+  echo "Passed: SystemdCgroup is not set to true"
+fi
 
 if ! kubectl get pods -n kwasm | grep -q "microk8s-provision-kwasm.*Completed"; then
   echo "Node installer job failed!"
@@ -72,7 +80,11 @@ echo "=== Step 4: Apply the workload ==="
 kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
-kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s
+if ! kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s; then
+  echo "Deployment failed to become ready!"
+  kubectl describe deployment wasm-spin
+  exit 1
+fi
 
 echo "Checking pod status..."
 kubectl get pods

@@ -51,8 +51,15 @@ echo "Applying KWasm node installer job..."
 kubectl apply -f ./k3s-kwasm-job.yml
 
 echo "Waiting for node installer job to complete..."
-kubectl wait -n kwasm --for=condition=Ready pod --selector=job-name=k3s-provision-kwasm --timeout=90s || true
 kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=k3s-provision-kwasm --timeout=60s
+
+# Verify the SystemdCgroup is set to true
+if sudo cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml | grep -A2 "runtimes.spin.options" | grep -q "SystemdCgroup = true"; then
+  echo "SystemdCgroup is set to true"
+else
+  echo "SystemdCgroup is not set to true"
+  exit 1
+fi
 
 if ! kubectl get pods -n kwasm | grep -q "k3s-provision-kwasm.*Completed"; then
   echo "Node installer job failed!"
