@@ -63,6 +63,11 @@ mkdir -p $NODE_ROOT$KWASM_DIR/bin/
 
 cp /assets/containerd-shim-spin-v2 $NODE_ROOT$KWASM_DIR/bin/
 
+# A bug in containerd makes BinaryName not work with shim not in PATH, so this statically links the kwasm installation to path
+# https://github.com/containerd/containerd/issues/11480
+mkdir -p $NODE_ROOT/usr/local/bin/
+ln -s $KWASM_DIR/bin/containerd-shim-spin-v2 $NODE_ROOT/usr/local/bin/containerd-shim-spin
+
 # K3S and RKE2 can detect spin shim themselves, no need to configure
 # https://github.com/k3s-io/k3s/pull/9519
 if ! ( $IS_K3S || $IS_RKE2_AGENT ) && ! grep -q spin $NODE_ROOT$CONTAINERD_CONF; then
