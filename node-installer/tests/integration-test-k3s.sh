@@ -51,11 +51,7 @@ echo "Applying KWasm node installer job..."
 kubectl apply -f ./k3s-kwasm-job.yml
 
 echo "Waiting for node installer job to complete..."
-if ! kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=k3s-provision-kwasm --timeout=60s; then
-  echo "Node installer job failed!"
-  kubectl describe pod -n kwasm
-  exit 1
-fi
+kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=k3s-provision-kwasm --timeout=60s
 
 # Verify the SystemdCgroup is set to true
 if sudo cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml | grep -A2 "runtimes.spin.options" | grep -q "SystemdCgroup = true"; then
@@ -76,11 +72,7 @@ sudo k3s ctr images pull ghcr.io/spinkube/containerd-shim-spin/examples/spin-rus
 kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
-if ! kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s; then
-  echo "Deployment failed to become ready!"
-  kubectl describe deployment wasm-spin
-  exit 1
-fi
+kubectl wait --for=condition=Available deployment/wasm-spin --timeout=120s
 
 echo "Checking pod status..."
 kubectl get pods
