@@ -69,7 +69,7 @@ cp /assets/containerd-shim-spin-v2 $NODE_ROOT$KWASM_DIR/bin/
 
 if ! grep -q spin $NODE_ROOT$CONTAINERD_CONF; then
     echo "Adding Spin runtime to containerd"
-    if $IS_K3S; then
+    if grep -q "version = 3" $NODE_ROOT$CONTAINERD_CONF; then
         echo '
 [plugins."io.containerd.cri.v1.runtime".containerd.runtimes."spin"]
     runtime_type = "'$KWASM_DIR'/bin/containerd-shim-spin-v2"
@@ -88,7 +88,7 @@ fi
 # configure SystemdCgroup
 if ! grep -q 'runtimes.spin.options' $NODE_ROOT$CONTAINERD_CONF && [ "$SYSTEMD_CGROUP" = "true" ]; then
     echo "Setting SystemdCgroup to $SYSTEMD_CGROUP in Spin containerd configuration"
-    if $IS_K3S; then
+    if grep -q "version = 3" $NODE_ROOT$CONTAINERD_CONF; then
         echo '
 [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.spin.options]
     SystemdCgroup = '$SYSTEMD_CGROUP'
