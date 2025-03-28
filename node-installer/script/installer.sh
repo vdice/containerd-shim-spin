@@ -23,12 +23,8 @@ if pgrep -f snap/microk8s > /dev/null; then
     fi
 elif ls $NODE_ROOT/var/lib/rancher/rke2/agent/etc/containerd/config.toml > /dev/null 2>&1 ; then
     IS_RKE2_AGENT=true
-    cp $NODE_ROOT/var/lib/rancher/rke2/agent/etc/containerd/config.toml $NODE_ROOT/var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl
-    CONTAINERD_CONF=/var/lib/rancher/rke2/agent/etc/containerd/config.toml.tmpl
 elif ls $NODE_ROOT/var/lib/rancher/k3s/agent/etc/containerd/config.toml > /dev/null 2>&1 ; then
     IS_K3S=true
-    cp $NODE_ROOT/var/lib/rancher/k3s/agent/etc/containerd/config.toml $NODE_ROOT/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
-    CONTAINERD_CONF=/var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
 elif pgrep -f /var/lib/k0s/bin/kubelet > /dev/null; then
     IS_K0S_WORKER=true
     CONTAINERD_CONF=/etc/k0s/containerd.d/spin.toml
@@ -67,9 +63,16 @@ mkdir -p $NODE_ROOT$KWASM_DIR/bin/
 
 cp /assets/containerd-shim-spin-v2 $NODE_ROOT$KWASM_DIR/bin/
 
-if ! grep -q spin $NODE_ROOT$CONTAINERD_CONF; then
+# A bug in containerd makes BinaryName not work with shim not in PATH, so this statically links the kwasm installation to path
+# https://github.com/containerd/containerd/issues/11480
+mkdir -p $NODE_ROOT/usr/local/bin/
+ln -s $KWASM_DIR/bin/containerd-shim-spin-v2 $NODE_ROOT/usr/local/bin/containerd-shim-spin
+
+# K3S and RKE2 can detect spin shim themselves, no need to configure
+# https://github.com/k3s-io/k3s/pull/9519
+if ! ( $IS_K3S || $IS_RKE2_AGENT ) && ! grep -q spin $NODE_ROOT$CONTAINERD_CONF; then
     echo "Adding Spin runtime to containerd"
-    if $IS_K3S; then
+    if grep -q "version = 3" $NODE_ROOT$CONTAINERD_CONF; then
         echo '
 [plugins."io.containerd.cri.v1.runtime".containerd.runtimes."spin"]
     runtime_type = "'$KWASM_DIR'/bin/containerd-shim-spin-v2"
@@ -88,7 +91,7 @@ fi
 # configure SystemdCgroup
 if ! grep -q 'runtimes.spin.options' $NODE_ROOT$CONTAINERD_CONF && [ "$SYSTEMD_CGROUP" = "true" ]; then
     echo "Setting SystemdCgroup to $SYSTEMD_CGROUP in Spin containerd configuration"
-    if $IS_K3S; then
+    if grep -q "version = 3" $NODE_ROOT$CONTAINERD_CONF; then
         echo '
 [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.spin.options]
     SystemdCgroup = '$SYSTEMD_CGROUP'
