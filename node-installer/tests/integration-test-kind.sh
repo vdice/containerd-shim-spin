@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-: ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
+: ${IMAGE_NAME:=ghcr.io/spinframework/containerd-shim-spin/node-installer:dev}
 
 echo "=== Step 1: Create a kind cluster ==="
 if kind get clusters | grep -q "spin-test"; then

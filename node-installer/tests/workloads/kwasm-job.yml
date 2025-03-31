@@ -10,7 +10,7 @@ spec:
   - env:
     - name: NODE_ROOT
       value: /mnt/node-root
-    image: ghcr.io/spinkube/containerd-shim-spin/node-installer:dev
+    image: ghcr.io/spinframework/containerd-shim-spin/node-installer:dev
     imagePullPolicy: IfNotPresent
     name: kwasm-provision
     securityContext:

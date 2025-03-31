@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-: ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
+: ${IMAGE_NAME:=ghcr.io/spinframework/containerd-shim-spin/node-installer:dev}
 
 echo "Installing K3s..."
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable=traefik --write-kubeconfig-mode=644" sh -

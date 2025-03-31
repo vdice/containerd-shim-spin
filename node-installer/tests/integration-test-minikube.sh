@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-: ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
+: ${IMAGE_NAME:=ghcr.io/spinframework/containerd-shim-spin/node-installer:dev}
 
 echo "=== Step 1: Create a MiniKube cluster ==="
 docker build -t minikube-custom:v0.0.46-fixed -f ./tests/Dockerfile.minikube-custom .
