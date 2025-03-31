@@ -56,7 +56,7 @@ if ! kubectl get pods -n kwasm | grep -q "k3s-provision-kwasm.*Completed"; then
 fi
 
 echo "=== Step 4: Apply the workload ==="
-sudo k3s ctr images pull ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.18.0
+sudo k3s ctr images pull ghcr.io/spinframework/containerd-shim-spin/examples/spin-rust-hello:v0.19.0
 kubectl apply -f ./tests/workloads/workload.yaml
 
 echo "Waiting for deployment to be ready..."
