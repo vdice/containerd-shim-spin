@@ -4,9 +4,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-### Change
+## [v0.19.0] - 2025-03-28
 
-- Bump containerd-shim-wasm to v0.9.0 ([#271](https://github.com/spinkube/containerd-shim-spin/pull/271)). To see the changes in the containerd-shim-wasm, please refer to the [containerd-shim-wasm changelog](https://github.com/containerd/runwasi/blob/containerd-shim-wasm/v0.9.0/crates/containerd-shim-wasm/CHANGELOG.md).
+### Changed
+
+- Bump Spin dependencies to v3.2.0 ([#302](https://github.com/spinkube/containerd-shim-spin/pull/302))
+- Bump containerd-shim-wasm to v1.0.0-rc.1 ([#299](https://github.com/spinkube/containerd-shim-spin/pull/299))
+- Update `node-installer` to work with K3s which already configures the Spin shim ([#301](https://github.com/spinframework/containerd-shim-spin/pull/301))
+- In `node-installer`, add SystemCgroup option to containerd runtime options for most K8s distributions ([#289](https://github.com/spinframework/containerd-shim-spin/pull/289))
 
 ## [v0.18.0] - 2025-01-14
 
@@ -58,7 +63,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
-[Unreleased]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.18.0..HEAD>
+[Unreleased]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.19.0..HEAD>
+[v0.19.0]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.18.0...v0.19.0>
 [v0.18.0]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.17.0...v0.18.0>
 [v0.17.0]: https://github.com/spinkube/containerd-shim-spin/compare/v0.16.0...v0.17.0
 [v0.16.0]: https://github.com/spinkube/containerd-shim-spin/compare/v0.15.1...v0.16.0
