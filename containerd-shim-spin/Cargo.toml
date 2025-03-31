@@ -11,11 +11,9 @@ Containerd shim for running Spin workloads.
 """
 
 [dependencies]
-containerd-shim-wasm = { version ="0.10.0", default-features = false, features = ["opentelemetry"]}
-http = "1"
+containerd-shim-wasm = { version = "1.0.0-rc.1", default-features = false, features = ["opentelemetry"]}
 log = "0.4"
 spin-app = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
-spin-core = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 spin-componentize = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 # Enable loading components precompiled by the shim
 spin-trigger = { git = "https://github.com/spinframework/spin", tag = "v3.2.0", features = [
@@ -26,22 +24,13 @@ spin-trigger-redis = { git = "https://github.com/spinframework/spin", tag = "v3.
 trigger-mqtt = { git = "https://github.com/spinframework/spin-trigger-mqtt", tag = "v0.4.0" }
 trigger-sqs = { git = "https://github.com/spinframework/spin-trigger-sqs", tag = "v0.9.0" }
 trigger-command = { git = "https://github.com/spinframework/spin-trigger-command", tag = "v0.3.0" }
-spin-manifest = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 spin-loader = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 spin-oci = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
-spin-common = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
-spin-expressions = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
-spin-factors-executor = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 spin-telemetry = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 spin-runtime-factors = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
-spin-factors = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 spin-factor-outbound-networking = { git = "https://github.com/spinframework/spin", tag = "v3.2.0" }
 wasmtime = "29.0.1"
-tokio = { version = "1", features = ["rt"] }
 openssl = { version = "*", features = ["vendored"] }
-serde = "1.0"
-serde_json = "1.0"
-url = "2.5"
 anyhow = "1.0"
 oci-spec = "0.7"
 futures = "0.3"
@@ -52,3 +41,4 @@ wat = "1"
 temp-env = "0.3.6"
 toml = "0.8"
 tempfile = "3"
+tokio = { version = "1", features = ["rt"] }

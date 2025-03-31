@@ -42,7 +42,7 @@ echo "Waiting for node installer job to complete..."
 kubectl wait -n kwasm --for=jsonpath='{.status.phase}'=Succeeded pod --selector=job-name=k3s-provision-kwasm --timeout=60s
 
 # Verify the SystemdCgroup is set to true
-if sudo cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml | grep -A2 "runtimes.spin.options" | grep -q "SystemdCgroup = true"; then
+if sudo cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml | grep -A2 -E "runtimes\.(spin|'spin'|\"spin\")\.options" | grep -q "SystemdCgroup = true"; then
   echo "SystemdCgroup is set to true"
 else
   echo "SystemdCgroup is not set to true"
