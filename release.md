@@ -53,16 +53,16 @@ following:
 
     ```console
     k3d cluster create wasm-cluster \
-      --image ghcr.io/spinkube/containerd-shim-spin/k3d:v0.15.0 \
+      --image ghcr.io/spinframework/containerd-shim-spin/k3d:v0.19.0 \
       -p "8081:80@loadbalancer" \
       --agents 2
-   kubectl apply -f https://github.com/spinkube/containerd-shim-spin/releases/download/v0.15.0/runtime.yaml
-   kubectl apply -f https://github.com/spinkube/containerd-shim-spin/releases/download/v0.15.0/workload.yaml
+   kubectl apply -f https://github.com/spinframework/containerd-shim-spin/releases/download/v0.19.0/runtime.yaml
+   kubectl apply -f https://github.com/spinframework/containerd-shim-spin/releases/download/v0.19.0/workload.yaml
     ```
    
 This will create a k3d cluster with the new release and deploy a test workload to it.
   
-1. Update [SpinKube documentation](https://github.com/spinkube/documentation) as
+1. Update [SpinKube documentation](https://github.com/spinframework/spinkube-docs) as
    necessary. Ensure the latest [node installer
    image](https://www.spinkube.dev/docs/install/installing-with-helm/#prepare-the-cluster)
    is used and update the [Shim and Spin version
