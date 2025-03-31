@@ -8,8 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Bump containerd-shim-wasm to v1.0.0-rc.1 ([#299](https://github.com/spinkube/containerd-shim-spin/pull/299))
 - Bump Spin dependencies to v3.2.0 ([#302](https://github.com/spinkube/containerd-shim-spin/pull/302))
+- Bump containerd-shim-wasm to v1.0.0-rc.1 ([#299](https://github.com/spinkube/containerd-shim-spin/pull/299))
+- Update `node-installer` to work with K3s which already configures the Spin shim ([#301](https://github.com/spinframework/containerd-shim-spin/pull/301))
+- In `node-installer`, add SystemCgroup option to containerd runtime options for most K8s distributions ([#289](https://github.com/spinframework/containerd-shim-spin/pull/289))
 
 ## [v0.18.0] - 2025-01-14
 
