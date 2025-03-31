@@ -2,7 +2,7 @@
 set -euo pipefail
 shopt -s expand_aliases
 
-: ${IMAGE_NAME:=ghcr.io/spinkube/containerd-shim-spin/node-installer:dev}
+: ${IMAGE_NAME:=ghcr.io/spinframework/containerd-shim-spin/node-installer:dev}
 
 echo "=== Step 1: Setup MicroK8s ==="
 if ! command -v microk8s >/dev/null 2>&1; then

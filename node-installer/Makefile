@@ -1,5 +1,5 @@
 SPIN_VERSION = v2
-IMAGE_NAME ?= ghcr.io/spinkube/containerd-shim-spin/node-installer
+IMAGE_NAME ?= ghcr.io/spinframework/containerd-shim-spin/node-installer
 
 # we only support x86_64 and aarch64 on Linux
 UNAME := $(shell uname -m)
