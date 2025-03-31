@@ -36,7 +36,7 @@ mkdir -p test/out_spin-dapr/
 docker save spin-dapr:latest -o test/out_spin-dapr/img.tar
 k3d image load -c wasm-cluster spin-dapr:latest test/out_spin-dapr/img.tar 
 # Apply the manifest
-kubectl apply -f https://github.com/spineframework/containerd-shim-spin/raw/main/deployments/workloads/runtime.yaml
+kubectl apply -f https://github.com/spinframework/containerd-shim-spin/raw/main/deployments/workloads/runtime.yaml
 kubectl apply -f images/spin-dapr/deploy.yaml
 
 # When everythin is up, forward the port and get the last kubernetes event

@@ -116,7 +116,7 @@ To carry out the installation step-by-step, do the following:
           runtimeClassName: wasmtime-spin-v2
           containers:
             - name: spin-hello
-              image: ghcr.io/spineframework/containerd-shim-spin/examples/spin-rust-hello:v0.19.0
+              image: ghcr.io/spinframework/containerd-shim-spin/examples/spin-rust-hello:v0.19.0
               command: ["/"]
     ```
 
