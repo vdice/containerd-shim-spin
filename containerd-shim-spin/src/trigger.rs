@@ -2,9 +2,9 @@ use std::{collections::HashSet, path::Path};
 
 use anyhow::Result;
 use futures::{future::BoxFuture, FutureExt};
-use log::info;
+use log::{debug, info};
 use spin_app::{locked::LockedApp, App};
-use spin_runtime_factors::{FactorsBuilder, TriggerFactors};
+use spin_runtime_factors::{FactorsBuilder, TriggerAppArgs, TriggerFactors};
 use spin_trigger::{
     cli::{FactorsConfig, TriggerAppBuilder, UserProvidedPath},
     loader::ComponentLoader,
@@ -36,9 +36,18 @@ where
     info!(" >>> running {} trigger", T::TYPE);
     let trigger = T::new(cli_args, &app)?;
     let builder: TriggerAppBuilder<_, FactorsBuilder> = TriggerAppBuilder::new(trigger);
-
+    let builder_args = match std::env::var("SPIN_MAX_INSTANCE_MEMORY") {
+        Ok(limit) => {
+            debug!("Setting instance max memory to {} bytes", limit);
+            TriggerAppArgs {
+                max_instance_memory: limit.parse().ok(),
+                ..Default::default()
+            }
+        }
+        Err(_) => Default::default(),
+    };
     let future = builder
-        .run(app, factors_config(), Default::default(), loader)
+        .run(app, factors_config(), builder_args, loader)
         .await?;
     Ok(future.boxed())
 }
