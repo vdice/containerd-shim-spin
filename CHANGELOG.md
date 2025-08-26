@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+- Update to use Spin v3.4.0 dependencies ([#355](https://github.com/spinframework/containerd-shim-spin/pull/355))
+
 ## [v0.20.0] - 2025-06-25
 
 ### Changed

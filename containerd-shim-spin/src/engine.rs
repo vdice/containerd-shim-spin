@@ -181,6 +181,7 @@ impl SpinSandbox {
                         address,
                         tls_cert: None,
                         tls_key: None,
+                        find_free_port: false,
                     };
                     trigger::run::<HttpTrigger>(cli_args, app, &loader).await?
                 }
