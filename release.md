@@ -4,7 +4,7 @@ To cut a new release of the `containerd-shim-spin`, you will need to do the
 following:
 
 1. Confirm that [CI is
-   green](https://github.com/spinkube/containerd-shim-spin/actions) for the commit selected to be
+   green](https://github.com/spinframework/containerd-shim-spin/actions) for the commit selected to be
    tagged and released.
 
 1. Change all references of the version number in repository using the [`version.sh`](./scripts/version.sh) script, which
@@ -34,12 +34,12 @@ following:
     # Create a GPG-signed and annotated tag
     git tag -s -m "Containerd Shim Spin v0.15.0" v0.15.0
 
-    # Push the tag to the remote corresponding to spinkube/containerd-shim-spin (here 'origin')
+    # Push the tag to the remote corresponding to spinframework/containerd-shim-spin (here 'origin')
     git push origin v0.15.0
     ```
 
 1. Pushing the tag upstream will trigger the [release
-   action](https://github.com/spinkube/containerd-shim-spin/actions/workflows/release.yaml).
+   action](https://github.com/spinframework/containerd-shim-spin/actions/workflows/release.yaml).
     - The release build will create binary releases of the shim and upload these
       assets to a new GitHub release for the pushed tag. Release notes are
       auto-generated but edit as needed especially around breaking changes or
