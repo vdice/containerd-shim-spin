@@ -7,12 +7,12 @@ following:
    green](https://github.com/spinkube/containerd-shim-spin/actions) for the commit selected to be
    tagged and released.
 
-1. Change all references of the version number in repository using the `version.sh` script, which
+1. Change all references of the version number in repository using the [`version.sh`](./scripts/version.sh) script, which
    updates all Cargo manifests and README documentation to use a bumped version. Specify a major,
    minor, or patch version update using the `-m`, `-n`, `-p` flags, respectively.
    ```sh
    # Update minor version (1.2.3 -> 1.3.0)
-   version.sh -n
+   scripts/version.sh -n
    ```
 
 1. Update [CHANGELOG.md](./CHANGELOG.md). The Unreleased section should be updated with the new
