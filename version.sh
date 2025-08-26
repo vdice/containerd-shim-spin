@@ -5,21 +5,30 @@ OTHER_FILES=${MD_FILES_TO_UPDATE:-"containerd-shim-spin/quickstart.md, images/sp
 get_version()
 {
     pkg_version=$(cargo pkgid --package containerd-shim-spin-v2)
-    version=$(echo $pkg_version | sed -E 's/.*@([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+    version=$(echo $pkg_version | sed -E 's/.*@([0-9]+\.[0-9]+\.[0-9]+.*?)$/\1/')
+    
     echo $version
 }
 
 new_version()
 {
     OLD_VERSION=$1
+    
+    # Extract core version (major.minor.patch) and any suffixes
+    core_version=$(echo "$OLD_VERSION" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+).*$/\1/')
+    suffix=$(echo "$OLD_VERSION" | sed -E 's/^[0-9]+\.[0-9]+\.[0-9]+(.*)$/\1/')
+    
     if [ "$SAME" != "1" ]; then
         if [ "$MAJOR" == "1" ]; then
-            NEW_VERSION="$( echo $OLD_VERSION | awk -F '.' '{print $1 + 1}' ).0.0"
+            NEW_VERSION="$( echo "$core_version" | awk -F '.' '{print $1 + 1}' ).0.0"
         elif [ "$MINOR" == "1" ]; then
-            NEW_VERSION="$( echo $OLD_VERSION | awk -F '.' '{print $1}' ).$( echo $OLD_VERSION | awk -F '.' '{print $2 + 1}' ).0"
+            NEW_VERSION="$( echo "$core_version" | awk -F '.' '{print $1}' ).$( echo "$core_version" | awk -F '.' '{print $2 + 1}' ).0"
         elif [ "$PATCH" == "1" ]; then
-            NEW_VERSION="$( echo $OLD_VERSION | awk -F '.' '{print $1}' ).$( echo $OLD_VERSION | awk -F '.' '{print $2}' ).$( echo $OLD_VERSION | awk -F '.' '{print $3 + 1}' )"
+            NEW_VERSION="$( echo "$core_version" | awk -F '.' '{print $1}' ).$( echo "$core_version" | awk -F '.' '{print $2}' ).$( echo "$core_version" | awk -F '.' '{print $3 + 1}' )"
         fi
+        # For version bumps, typically strip pre-release/build metadata unless you want to preserve it
+        # Uncomment the next line if you want to preserve suffixes on version bumps:
+        # NEW_VERSION="$NEW_VERSION$suffix"
     else
         NEW_VERSION=$OLD_VERSION
     fi
@@ -74,7 +83,6 @@ OLD_VERSION=$(get_version)
 NEW_VERSION=$(new_version $OLD_VERSION)
 
 echo "Updating to version: $NEW_VERSION"
-
 TOML_VERSION_PATTERN="^version = .*"
 TOML_VERSION_LINE="version = \"$NEW_VERSION\""
 
