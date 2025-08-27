@@ -2000,7 +2000,7 @@ dependencies = [
 
 [[package]]
 name = "containerd-shim-spin-tests"
-version = "0.20.0"
+version = "0.21.0"
 dependencies = [
  "anyhow",
  "curl",
@@ -2011,7 +2011,7 @@ dependencies = [
 
 [[package]]
 name = "containerd-shim-spin-v2"
-version = "0.20.0"
+version = "0.21.0"
 dependencies = [
  "anyhow",
  "containerd-shim-wasm",
@@ -7813,7 +7813,7 @@ checksum = "24188a676b6ae68c3b2cb3a01be17fbf7240ce009799bb56d5b1409051e78fde"
 
 [[package]]
 name = "shim-conformance-tests"
-version = "0.20.0"
+version = "0.21.0"
 dependencies = [
  "anyhow",
  "conformance-tests",
