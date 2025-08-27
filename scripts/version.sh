@@ -47,7 +47,7 @@ update_file_version()
 }
 
 
-BASEDIR=$(dirname "$0")
+BASEDIR=$(dirname "$(dirname "$0")")
 
 SAME=0
 MAJOR=0
