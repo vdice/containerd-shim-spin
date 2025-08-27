@@ -39,10 +39,9 @@ where
     let builder_args = match std::env::var("SPIN_MAX_INSTANCE_MEMORY") {
         Ok(limit) => {
             debug!("Setting instance max memory to {} bytes", limit);
-            TriggerAppArgs {
-                max_instance_memory: limit.parse().ok(),
-                ..Default::default()
-            }
+            let mut args = TriggerAppArgs::default();
+            args.max_instance_memory = limit.parse().ok();
+            args
         }
         Err(_) => Default::default(),
     };
