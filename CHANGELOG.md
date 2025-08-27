@@ -5,7 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Changed
+- 
+
+## [v0.21.0] - 2025-08-27
+
+### Changed
 - Update to use Spin v3.4.0 dependencies ([#355](https://github.com/spinframework/containerd-shim-spin/pull/355))
+- Add script to easily update project version before releases ([#200](https://github.com/spinframework/containerd-shim-spin/pull/200))
 
 ## [v0.20.0] - 2025-06-25
 
