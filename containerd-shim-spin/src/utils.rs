@@ -57,7 +57,7 @@ pub(crate) fn parse_addr(addr: &str) -> Result<SocketAddr> {
     let addrs: SocketAddr = addr
         .to_socket_addrs()?
         .next()
-        .ok_or_else(|| anyhow!("could not parse address: {}", addr))?;
+        .ok_or_else(|| anyhow!("could not parse address: {addr}"))?;
     Ok(addrs)
 }
 

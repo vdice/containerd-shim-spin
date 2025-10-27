@@ -42,7 +42,7 @@ mod test {
             }
             i += 1;
             if i == retry_times {
-                anyhow::bail!("failed to curl for {}", url);
+                anyhow::bail!("failed to curl for {url}");
             }
             buf = Vec::new();
             tokio::time::sleep(Duration::from_secs(interval_in_secs)).await;

@@ -99,8 +99,7 @@ pub(crate) fn get_supported_triggers(locked_app: &LockedApp) -> anyhow::Result<H
             let trigger_type = &trigger.trigger_type;
             if !supported_triggers.contains(trigger_type.as_str()) {
                 Err(anyhow::anyhow!(
-                    "Only Http, Redis, MQTT, SQS, and Command triggers are currently supported. Found unsupported trigger: {:?}",
-                    trigger_type
+                    "Only Http, Redis, MQTT, SQS, and Command triggers are currently supported. Found unsupported trigger: {trigger_type:?}"
                 ))
             } else {
                 Ok(trigger_type.clone())
