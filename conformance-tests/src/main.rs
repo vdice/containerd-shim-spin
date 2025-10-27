@@ -162,7 +162,7 @@ impl SpinShim {
         ctr_run_id: &str,
     ) -> anyhow::Result<Self> {
         let port = get_available_port().context("no available port")?;
-        let listen_adress_env = format!("SPIN_HTTP_LISTEN_ADDR=0.0.0.0:{}", port);
+        let listen_adress_env = format!("SPIN_HTTP_LISTEN_ADDR=0.0.0.0:{port}");
         let mut ctr_cmd = std::process::Command::new(ctr_binary_path);
         let child = ctr_cmd
             .arg("run")

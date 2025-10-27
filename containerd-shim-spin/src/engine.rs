@@ -99,11 +99,11 @@ impl Sandbox for SpinSandbox {
                 Ok(0)
             }
             Ok(Err(err)) => {
-                log::error!("run_wasi ERROR >>>  failed: {:?}", err);
+                log::error!("run_wasi ERROR >>>  failed: {err:?}");
                 Err(err)
             }
             Err(aborted) => {
-                info!("Received signal to abort: {:?}", aborted);
+                info!("Received signal to abort: {aborted:?}");
                 Ok(0)
             }
         }
