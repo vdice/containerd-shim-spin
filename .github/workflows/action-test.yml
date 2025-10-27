@@ -39,7 +39,7 @@ jobs:
  
       - name: Upload debug logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: debug-logs
           path: debug-logs/
