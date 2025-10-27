@@ -43,7 +43,7 @@ impl Source {
                             if name == spin_oci::client::SPIN_APPLICATION_MEDIA_TYPE =>
                         {
                             let path = PathBuf::from("/spin.json");
-                            log::info!("writing spin oci config to {:?}", path);
+                            log::info!("writing spin oci config to {path:?}");
                             File::create(&path)
                                 .context("failed to create spin.json")?
                                 .write_all(&artifact.layer)

@@ -38,7 +38,7 @@ where
     let builder: TriggerAppBuilder<_, FactorsBuilder> = TriggerAppBuilder::new(trigger);
     let builder_args = match std::env::var("SPIN_MAX_INSTANCE_MEMORY") {
         Ok(limit) => {
-            debug!("Setting instance max memory to {} bytes", limit);
+            debug!("Setting instance max memory to {limit} bytes");
             let mut args = TriggerAppArgs::default();
             args.max_instance_memory = limit.parse().ok();
             args

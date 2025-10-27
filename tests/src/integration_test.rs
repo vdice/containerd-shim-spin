@@ -31,13 +31,13 @@ mod test {
             // verify res is ok and not 404
             match res {
                 Ok(_) => {
-                    println!("response_code: {}", response_code);
+                    println!("response_code: {response_code}");
                     if response_code / 100 == 2 {
                         break; // 2xx response
                     }
                 }
                 Err(e) => {
-                    println!("res: {}, response_code: {}", e, response_code);
+                    println!("res: {e}, response_code: {response_code}");
                 }
             }
             i += 1;
@@ -55,9 +55,9 @@ mod test {
         let host_port = 8082;
 
         // curl for hello
-        println!(" >>> curl http://localhost:{}/spin/hello", host_port);
+        println!(" >>> curl http://localhost:{host_port}/spin/hello");
         let res = retry_get(
-            &format!("http://localhost:{}/spin/hello", host_port),
+            &format!("http://localhost:{host_port}/spin/hello"),
             RETRY_TIMES,
             INTERVAL_IN_SECS,
         )
@@ -72,9 +72,9 @@ mod test {
         let host_port = 8082;
 
         // curl for hello
-        println!(" >>> curl http://localhost:{}/keyvalue/keyvalue", host_port);
+        println!(" >>> curl http://localhost:{host_port}/keyvalue/keyvalue");
         let res = retry_get(
-            &format!("http://localhost:{}/keyvalue/keyvalue", host_port),
+            &format!("http://localhost:{host_port}/keyvalue/keyvalue"),
             RETRY_TIMES,
             INTERVAL_IN_SECS,
         )
@@ -96,16 +96,13 @@ mod test {
 
         let forward_port = port_forward_svc(redis_port, "redis").await?;
 
-        let client = redis::Client::open(format!("redis://localhost:{}", forward_port))?;
+        let client = redis::Client::open(format!("redis://localhost:{forward_port}"))?;
         let mut con = client.get_multiplexed_async_connection().await?;
 
         // curl for hello
-        println!(
-            " >>> curl http://localhost:{}/outboundredis/hello",
-            host_port
-        );
+        println!(" >>> curl http://localhost:{host_port}/outboundredis/hello");
         let _ = retry_get(
-            &format!("http://localhost:{}/outboundredis/hello", host_port),
+            &format!("http://localhost:{host_port}/outboundredis/hello"),
             RETRY_TIMES,
             INTERVAL_IN_SECS,
         )
@@ -126,9 +123,9 @@ mod test {
         let host_port = 8082;
 
         // curl for hello
-        println!(" >>> curl http://localhost:{}/multi-trigger-app", host_port);
+        println!(" >>> curl http://localhost:{host_port}/multi-trigger-app");
         let res = retry_get(
-            &format!("http://localhost:{}/multi-trigger-app", host_port),
+            &format!("http://localhost:{host_port}/multi-trigger-app"),
             RETRY_TIMES,
             INTERVAL_IN_SECS,
         )
@@ -147,7 +144,7 @@ mod test {
 
         let forward_port = port_forward_svc(redis_port, "redis").await?;
 
-        let client = redis::Client::open(format!("redis://localhost:{}", forward_port))
+        let client = redis::Client::open(format!("redis://localhost:{forward_port}"))
             .context("connecting to redis")?;
         let mut con = client.get_multiplexed_async_connection().await?;
 
@@ -225,15 +222,9 @@ mod test {
         let host_port = 8082;
 
         // curl for static asset
-        println!(
-            " >>> curl http://localhost:{}/static-assets/jabberwocky.txt",
-            host_port
-        );
+        println!(" >>> curl http://localhost:{host_port}/static-assets/jabberwocky.txt");
         let res = retry_get(
-            &format!(
-                "http://localhost:{}/static-assets/jabberwocky.txt",
-                host_port
-            ),
+            &format!("http://localhost:{host_port}/static-assets/jabberwocky.txt"),
             RETRY_TIMES,
             INTERVAL_IN_SECS,
         )
@@ -260,15 +251,12 @@ mod test {
     async fn port_forward_svc(svc_port: u16, svc_name: &str) -> Result<u16> {
         let port = get_random_port()?;
 
-        println!(
-            " >>> kubectl portforward svc {} {}:{} ",
-            svc_name, port, svc_port
-        );
+        println!(" >>> kubectl portforward svc {svc_name} {port}:{svc_port} ");
 
         Command::new("kubectl")
             .arg("port-forward")
             .arg(svc_name)
-            .arg(format!("{}:{}", port, svc_port))
+            .arg(format!("{port}:{svc_port}"))
             .spawn()?;
         tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
         Ok(port)
