@@ -36,6 +36,7 @@ jobs:
       - uses: actions/download-artifact@v6
         with:
           path: _artifacts
+          pattern: "!*.dockerbuild"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -123,6 +124,7 @@ jobs:
       - uses: actions/download-artifact@v6
         with:
           path: _artifacts
+          pattern: "!*.dockerbuild"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -145,7 +147,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push node-installer image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: |
