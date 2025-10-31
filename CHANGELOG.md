@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - 
+## [v0.22.0] - 2025-10-31
+
+### Changed
+- Update to use Spin v3.5.0 dependencies ([#369](https://github.com/spinframework/containerd-shim-spin/pull/369))
+- Dependencies updates ([#364](https://github.com/spinframework/containerd-shim-spin/pull/364), [#365](https://github.com/spinframework/containerd-shim-spin/pull/365), [#366](https://github.com/spinframework/containerd-shim-spin/pull/366), [#367](https://github.com/spinframework/containerd-shim-spin/pull/367))
 
 ## [v0.21.0] - 2025-08-27
 
@@ -82,7 +87,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
-[Unreleased]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.19.0..HEAD>
+[Unreleased]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.22.0..HEAD>
+[v0.22.0]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.21.0...v0.22.0>
+[v0.21.0]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.20.0...v0.21.0>
+[v0.20.0]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.19.0...v0.20.0>
 [v0.19.0]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.18.0...v0.19.0>
 [v0.18.0]: <https://github.com/spinkube/containerd-shim-spin/compare/v0.17.0...v0.18.0>
 [v0.17.0]: https://github.com/spinkube/containerd-shim-spin/compare/v0.16.0...v0.17.0
