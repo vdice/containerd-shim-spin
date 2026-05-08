@@ -42,9 +42,9 @@ kind: Ingress
 metadata:
   name: wasm-ingress
   annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/ssl-redirect: "false"
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - http:
         paths:

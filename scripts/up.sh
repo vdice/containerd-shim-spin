@@ -21,14 +21,14 @@ if [ "$(docker inspect -f '{{.State.Running}}' "${registry_name}" 2>/dev/null ||
   docker run -d --restart=always -p "${registry_port}:5000" --network bridge --name "${registry_name}" registry:2
 fi
 
-# Create a kind cluster using our custom node image
+# Create a kind cluster using our custom node image. Patch containerd to have the spin shim configured and to set up the registry config per kind upstream local registry documentation: https://kind.sigs.k8s.io/docs/user/local-registry/.
 cat <<EOF | kind create cluster --name "$cluster_name" --image kind-shim-test --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 containerdConfigPatches:
 - |-
-  [plugins."io.containerd.cri.v1.runtime".registry.mirrors."localhost:${registry_port}"]
-    endpoint = ["http://${registry_name}:5000"]
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
 - |-
   [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.spin]
     runtime_type = "io.containerd.spin.v2"
@@ -56,16 +56,31 @@ if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${registry_
   docker network connect "kind" "${registry_name}"
 fi
 
+# Configure each node to resolve localhost:${registry_port} to the registry container.
+# This is needed because localhost inside the node container is not the host's localhost.
+# Taken from kind's documentation on local registries: https://kind.sigs.k8s.io/docs/user/local-registry/
+REGISTRY_DIR="/etc/containerd/certs.d/localhost:${registry_port}"
+for node in $(kind get nodes --name "$cluster_name"); do
+  docker exec "${node}" mkdir -p "${REGISTRY_DIR}"
+  cat <<HOSTEOF | docker exec -i "${node}" cp /dev/stdin "${REGISTRY_DIR}/hosts.toml"
+[host."http://${registry_name}:5000"]
+HOSTEOF
+done
+
 kubectl wait --for=condition=ready node --all --timeout=120s
 
-# Install Traefik as the ingress controller for local routing in Kind.
+# Install Traefik as the ingress controller for local routing in Kind. We are requiring that it is run on the control-plane node where the hostPort is exposed.
 helm repo add traefik https://helm.traefik.io/traefik
 helm repo update
 helm install traefik traefik/traefik \
   --namespace traefik --create-namespace \
   --set deployment.kind=DaemonSet \
   --set service.type=ClusterIP \
-  --set ports.web.hostPort=80
+  --set ports.web.hostPort=80 \
+  --set tolerations[0].key=node-role.kubernetes.io/control-plane \
+  --set tolerations[0].effect=NoSchedule \
+  --set tolerations[0].operator=Exists \
+  --set nodeSelector."kubernetes\.io/hostname"=test-cluster-control-plane
 kubectl wait --namespace traefik --for=condition=ready pod --selector=app.kubernetes.io/name=traefik --timeout=180s
 
 # Iterate through the Docker images and build them
