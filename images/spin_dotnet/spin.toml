@@ -1,5 +1,5 @@
 spin_version = "1"
-authors = ["Jiaxiao Zhou <jiazho@microsoft.com>"]
+authors = ["Jiaxiao Zhou <duibao55328@gmail.com>"]
 description = "just a dotnet project"
 name = "MyTestProject"
 version = "1.0.0"
