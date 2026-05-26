@@ -45,6 +45,13 @@ jobs:
         if: failure()
         run: kubectl describe pods
 
+      - name: Dump app logs
+        if: failure()
+        run: |
+          for app in wasm-spin spin-outbound-redis spin-multi-trigger-app spin-static-assets; do
+            kubectl logs -l app=$app || true
+          done
+
       - name: Collect debug logs
         if: failure()
         run: make tests/collect-debug-logs
